@@ -27,4 +27,4 @@ RUN \
     apt-get autoremove --yes && \
     rm -rf /var/lib/apt/* /tmp/* /var/tmp/* /usr/share/doc/*
 
-CMD ["node server.js"]
+CMD ["sh", "-c", "node /app/server.js"]

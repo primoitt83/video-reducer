@@ -14,7 +14,6 @@ services:
       - ./app:/app
     ports:
       - 3030:3030
-    command: sleep 1000000
     environment:
       - NODE_ENV=development
     devices:
@@ -32,4 +31,3 @@ services:
 networks:
   docker:
     external: true
-      

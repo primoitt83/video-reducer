@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Conversor de Vídeo Avançado</title>
+</head>
+<body style="font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: #f5f5f5;">
+    <div style="display: flex; flex-direction: column; gap: 20px;">
+        <h1 style="color: #333; text-align: center;">Conversor de Vídeo Avançado</h1>
+        
+        <!-- Seção de Upload -->
+        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="color: #333; margin-top: 0;">1. Upload do Vídeo</h2>
+            <input type="file" id="videoInput" accept="video/*" style="margin-bottom: 10px;">
+            <button id="uploadBtn" style="background-color: #4CAF50; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Enviar Vídeo</button>
+            <div id="uploadProgress" style="margin: 15px 0;">
+                <div style="width: 100%; background-color: #e0e0e0; border-radius: 4px;">
+                    <div id="progressBarFill" style="height: 20px; background-color: #4CAF50; width: 0%; border-radius: 4px;"></div>
+                </div>
+            </div>
+            <div id="uploadStatus" style="margin: 10px 0; padding: 10px; border-radius: 4px;"></div>
+        </div>
+        
+        <!-- Seção de Processamento -->
+        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="color: #333; margin-top: 0;">2. Processamento</h2>
+            
+            <div id="fileSelection" style="margin-bottom: 15px;">
+                <label for="fileSelect" style="display: block; margin-bottom: 5px; font-weight: bold;">Vídeo para processar:</label>
+                <select id="fileSelect" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"></select>
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 10px; font-weight: bold;">Opções de Processamento:</label>
+                
+                <div style="margin-bottom: 10px;">
+                    <label style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <input type="radio" name="processingMode" value="preset" checked style="margin-right: 8px;">
+                        <span>Usar perfil pré-definido</span>
+                    </label>
+                    
+                    <div id="presetOptions" style="margin-left: 24px;">
+                        <select id="resolutionSelect" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            <option value="180p">320x180 (180p) - 270kbps</option>
+                            <option value="90p">160x90 (90p) - 135kbps</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div>
+                    <label style="display: flex; align-items: center; margin-bottom: 8px;">
+                        <input type="radio" name="processingMode" value="custom" style="margin-right: 8px;">
+                        <span>Configuração personalizada</span>
+                    </label>
+                    
+                    <div id="customOptions" style="display: none; margin-left: 24px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-size: 0.9em;">Largura (px)</label>
+                                <input type="number" id="customWidth" min="80" max="3840" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-size: 0.9em;">Altura (px)</label>
+                                <input type="number" id="customHeight" min="45" max="2160" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            </div>
+                            <div>
+                                <label style="display: block; margin-bottom: 5px; font-size: 0.9em;">Bitrate</label>
+                                <input type="text" id="customBitrate" placeholder="ex: 500k" style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+                            </div>
+                        </div>
+                        <div style="font-size: 0.8em; color: #666; margin-top: 5px;">
+                            <p>Exemplos de bitrate: 300k, 1M, 500k</p>
+                            <p>Proporção recomendada: 16:9 (ex: 640x360)</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin: 15px 0;">
+                <label style="display: flex; align-items: center; margin-bottom: 10px;">
+                    <input type="checkbox" id="compressAudio" style="margin-right: 8px;">
+                    <span>Comprimir áudio (32k mono)</span>
+                </label>
+                
+                <label style="display: flex; align-items: center;">
+                    <input type="checkbox" id="removeOriginal" style="margin-right: 8px;">
+                    <span>Remover vídeo original após processamento</span>
+                </label>
+            </div>
+            
+            <button id="processBtn" style="background-color: #4CAF50; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; width: 100%;">Processar Vídeo</button>
+            <div id="processingStatus" style="margin-top: 15px; padding: 10px; border-radius: 4px;"></div>
+        </div>
+        
+        <!-- Seção de Download -->
+        <div style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; background-color: white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h2 style="color: #333; margin-top: 0;">3. Download</h2>
+            <div id="downloadSection" style="display: none; text-align: center;">
+                <p style="margin-bottom: 15px;">Vídeo processado com sucesso!</p>
+                <a id="downloadLink" download>
+                    <button style="background-color: #2196F3; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px;">Baixar Vídeo Processado</button>
+                </a>
+            </div>
+            <div id="downloadStatus" style="margin-top: 15px; padding: 10px; border-radius: 4px;"></div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais
+        let uploadedFiles = [];
+        
+        // Elementos do DOM
+        const uploadBtn = document.getElementById('uploadBtn');
+        const videoInput = document.getElementById('videoInput');
+        const progressBarFill = document.getElementById('progressBarFill');
+        const uploadStatus = document.getElementById('uploadStatus');
+        const fileSelect = document.getElementById('fileSelect');
+        const processBtn = document.getElementById('processBtn');
+        const processingStatus = document.getElementById('processingStatus');
+        const downloadSection = document.getElementById('downloadSection');
+        const downloadLink = document.getElementById('downloadLink');
+        const downloadStatus = document.getElementById('downloadStatus');
+        
+        // Controle dos modos de processamento
+        document.querySelectorAll('input[name="processingMode"]').forEach(radio => {
+            radio.addEventListener('change', function() {
+                document.getElementById('presetOptions').style.display = 
+                    this.value === 'preset' ? 'block' : 'none';
+                document.getElementById('customOptions').style.display = 
+                    this.value === 'custom' ? 'block' : 'none';
+            });
+        });
+
+        // Carregar lista de arquivos ao iniciar
+        loadFileList();
+        
+        // Função para carregar lista de arquivos
+        async function loadFileList() {
+            try {
+                const response = await fetch('/list-uploads');
+                const data = await response.json();
+                uploadedFiles = data.files;
+                
+                fileSelect.innerHTML = '';
+                uploadedFiles.forEach(file => {
+                    const option = document.createElement('option');
+                    option.value = file;
+                    option.textContent = file;
+                    fileSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Erro ao carregar arquivos:', error);
+                showStatus(uploadStatus, 'Erro ao carregar lista de vídeos', 'error');
+            }
+        }
+        
+        // Função para upload de vídeo
+        function handleUpload() {
+            const file = videoInput.files[0];
+            if (!file) {
+                showStatus(uploadStatus, 'Selecione um arquivo primeiro', 'error');
+                return;
+            }
+            
+            if (file.size > 100 * 1024 * 1024) { // 100MB
+                showStatus(uploadStatus, 'Arquivo muito grande (máx. 100MB)', 'error');
+                return;
+            }
+            
+            const formData = new FormData();
+            formData.append('video', file);
+            
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/upload', true);
+            
+            xhr.upload.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const percent = Math.round((e.loaded / e.total) * 100);
+                    progressBarFill.style.width = percent + '%';
+                }
+            };
+            
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    showStatus(uploadStatus, 'Upload concluído com sucesso!', 'success');
+                    progressBarFill.style.width = '0%';
+                    videoInput.value = '';
+                    loadFileList();
+                } else {
+                    showStatus(uploadStatus, 'Erro no upload: ' + xhr.responseText, 'error');
+                }
+            };
+            
+            xhr.onerror = function() {
+                showStatus(uploadStatus, 'Erro na conexão', 'error');
+            };
+            
+            showStatus(uploadStatus, 'Enviando arquivo...', 'processing');
+            xhr.send(formData);
+        }
+        
+        // Função para processar vídeo
+        async function processVideo() {
+            const filename = fileSelect.value;
+            const processingMode = document.querySelector('input[name="processingMode"]:checked').value;
+            const compressAudio = document.getElementById('compressAudio').checked;
+            const removeOriginal = document.getElementById('removeOriginal').checked;
+            
+            let params = {
+                filename,
+                compressAudio,
+                removeAfterProcessing: removeOriginal
+            };
+            
+            if (processingMode === 'preset') {
+                params.resolution = document.getElementById('resolutionSelect').value;
+            } else {
+                params.resolution = 'custom';
+                params.customWidth = document.getElementById('customWidth').value;
+                params.customHeight = document.getElementById('customHeight').value;
+                params.customBitrate = document.getElementById('customBitrate').value;
+                
+                // Validações
+                if (!params.customWidth || !params.customHeight || !params.customBitrate) {
+                    showStatus(processingStatus, 'Preencha todos os campos da configuração personalizada', 'error');
+                    return;
+                }
+                
+                if (!/^\d+[kM]$/.test(params.customBitrate)) {
+                    showStatus(processingStatus, 'Formato de bitrate inválido. Use valores como 300k ou 1M', 'error');
+                    return;
+                }
+                
+                if (params.customWidth < 80 || params.customWidth > 3840) {
+                    showStatus(processingStatus, 'Largura deve estar entre 80 e 3840 pixels', 'error');
+                    return;
+                }
+                
+                if (params.customHeight < 45 || params.customHeight > 2160) {
+                    showStatus(processingStatus, 'Altura deve estar entre 45 e 2160 pixels', 'error');
+                    return;
+                }
+            }
+            
+            try {
+                processBtn.disabled = true;
+                showStatus(processingStatus, 'Processando vídeo... Aguarde', 'processing');
+                
+                const response = await fetch('/process-video/low-res', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(params)
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    let statusMsg = 'Vídeo processado com sucesso!';
+                    if (processingMode === 'custom') {
+                        statusMsg += ` (${params.customWidth}x${params.customHeight}, bitrate: ${params.customBitrate})`;
+                    }
+                    statusMsg += ` | Áudio: ${compressAudio ? '32k mono' : 'original'}`;
+                    
+                    showStatus(processingStatus, statusMsg, 'success');
+                    
+                    // Mostrar seção de download
+                    downloadLink.href = data.url;
+                    downloadSection.style.display = 'block';
+                    
+                    // Atualizar lista de arquivos
+                    if (removeOriginal) {
+                        loadFileList();
+                    }
+                } else {
+                    showStatus(processingStatus, data.error || 'Erro no processamento do vídeo', 'error');
+                }
+            } catch (error) {
+                showStatus(processingStatus, 'Erro: ' + error.message, 'error');
+            } finally {
+                processBtn.disabled = false;
+            }
+        }
+        
+        // Função auxiliar para mostrar status
+        function showStatus(element, message, type) {
+            element.textContent = message;
+            element.style.backgroundColor = 
+                type === 'success' ? '#dff0d8' : 
+                type === 'error' ? '#f2dede' : '#d9edf7';
+            element.style.color = 
+                type === 'success' ? '#3c763d' : 
+                type === 'error' ? '#a94442' : '#31708f';
+            element.style.border = '1px solid';
+            element.style.borderColor = 
+                type === 'success' ? '#d6e9c6' : 
+                type === 'error' ? '#ebccd1' : '#bce8f1';
+        }
+
+        // Event Listeners
+        uploadBtn.addEventListener('click', handleUpload);
+        processBtn.addEventListener('click', processVideo);
+    </script>
+</body>
+</html>
